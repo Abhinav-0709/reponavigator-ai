@@ -1,5 +1,5 @@
 import { generateText, streamText } from 'ai';
-import { groq, google } from '@/lib/ai/providers';
+import { createGroq, createGoogle } from '@/lib/ai/providers';
 
 export const orchestrator = {
     /**
@@ -7,7 +7,7 @@ export const orchestrator = {
      * 1. Groq (Llama-3) plans the response and selects relevant files/context.
      * 2. Gemini (Flash) executes the plan and streams the response.
      */
-    async streamHybridResponse(messages: any[], context: string, onFinish?: (text: string) => Promise<void>) {
+    async streamHybridResponse(messages: any[], context: string, onFinish?: (text: string) => Promise<void>, apiKeys?: { groq?: string, google?: string }) {
 
         // Squash messages for Groq (Llama 3) to avoid any structural/typing issues with the API
         // We convert the history into a single "Context" block in the user message.
@@ -26,7 +26,7 @@ export const orchestrator = {
             .join('\n\n');
         // ye groq or Librarian ka prompt hh
         const { text: plan } = await generateText({
-            model: groq('llama-3.1-8b-instant'),
+            model: createGroq(apiKeys?.groq)('llama-3.1-8b-instant'),
             system: `You are an expert software architect acting as a "Librarian". 
             Your goal is to analyze the user's latest query and the repo structure to create a concise "Research Plan".
             
@@ -44,7 +44,7 @@ export const orchestrator = {
 
         // ye gemini or Architect ka prompt hh 
         const result = await streamText({
-            model: google('gemini-2.5-flash'),
+            model: createGoogle(apiKeys?.google)('gemini-2.5-flash'),
             system: `You are an expert developer. 
             CONTEXT:
             ${context}

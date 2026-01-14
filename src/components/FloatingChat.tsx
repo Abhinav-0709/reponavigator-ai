@@ -13,9 +13,6 @@ export function FloatingChat({ repoId }: { repoId: string }) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     // Pass repoId via custom header or body in requestOptions
-    // Pass repoId via custom header or body in requestOptions
-    // Pass repoId via custom header or body in requestOptions
-    // Pass repoId via custom header or body in requestOptions
     const { messages, setMessages, sendMessage, status } = useChat() as any;
 
     const [input, setInput] = useState("");
@@ -28,9 +25,14 @@ export function FloatingChat({ repoId }: { repoId: string }) {
         e.preventDefault();
         if (!input.trim()) return;
 
+        const apiKeys = {
+            groq: localStorage.getItem("groq_api_key") || undefined,
+            google: localStorage.getItem("google_api_key") || undefined,
+        };
+
         await sendMessage({
             text: input,
-        }, { body: { repoId } });
+        }, { body: { repoId, apiKeys } });
 
         setInput("");
     };

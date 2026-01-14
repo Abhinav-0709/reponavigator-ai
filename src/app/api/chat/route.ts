@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { messages, repoId } = await req.json();
+    const { messages, repoId, apiKeys } = await req.json();
     await dbConnect();
 
     const repo = await Repository.findById(repoId);
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
             role: 'assistant',
             content: aiText
         });
-    });
+    }, apiKeys); // 👈 Pass apiKeys to orchestrator
 
     return result.toUIMessageStreamResponse();
 }

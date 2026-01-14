@@ -2,13 +2,13 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 
 // Create a custom OpenAI provider instance pointing to Groq's API
-export const groq = createOpenAI({
+// We export a factory function to allow dynamic API keys (BYOK)
+export const createGroq = (apiKey?: string) => createOpenAI({
     baseURL: 'https://api.groq.com/openai/v1',
-    apiKey: process.env.GROQ_API_KEY,
+    apiKey: apiKey || process.env.GROQ_API_KEY,
 });
 
-// Export the google provider (Gemini)
-// Note: @ai-sdk/google exports a helper 'google' directly, but we can also wrap it if needed for config.
-// For now, we'll just re-export the standard one or configure it if we need specific settings.
-import { google as googleProvider } from '@ai-sdk/google';
-export const google = googleProvider;
+// Export the google provider (Gemini) factory
+export const createGoogle = (apiKey?: string) => createGoogleGenerativeAI({
+    apiKey: apiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+});

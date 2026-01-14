@@ -3,11 +3,11 @@
 import dbConnect from "@/lib/dbConnect";
 import Repository from "@/models/Repository";
 import { getRepoStructure } from "@/lib/github/githubService";
-import { google } from "@ai-sdk/google";
+import { createGoogle } from "@/lib/ai/providers";
 import { generateText } from "ai";
 import { revalidatePath } from "next/cache";
 
-export async function ingestRepo(url: string) {
+export async function ingestRepo(url: string, apiKeys?: { google?: string }) {
     try {
         console.log("1. Connecting to DB...");
         await dbConnect();
@@ -39,7 +39,7 @@ export async function ingestRepo(url: string) {
         let architectureSummary = "Summary generation failed.";
         try {
             const { text } = await generateText({
-                model: google("gemini-2.5-flash"),
+                model: createGoogle(apiKeys?.google)("gemini-2.5-flash"),
                 // ✅ ADDING ABORT SIGNAL/TIMEOUT
                 abortSignal: AbortSignal.timeout(60000), // 60 second limit
                 prompt: `Analyze this file list for repo "${repoName}". What is the tech stack and architecture? \n\n ${fileList}`,
