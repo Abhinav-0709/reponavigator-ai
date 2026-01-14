@@ -77,6 +77,13 @@ Just paste a GitHub URL. The system automatically:
 *   **PDF Reports**: One-click export of the AI-generated Architecture Summary.
 *   **Modern CSS Support**: Uses browser-native rendering (foreignObject) to correctly capture modern CSS variables and layouts in the PDF.
 
+### 4. Flexible API Authentication & Security
+*   **Dual-Mode Authentication**:
+    *   **Global Mode (Blue)**: Uses server-configured API keys for seamless onboarding.
+    *   **Personal Mode (Green)**: Users can input their own Groq/Gemini keys via the Settings Drawer. This overrides the global keys for their session.
+*   **Zero-Persistence**: Personal keys are stored **locally in your browser** (localStorage) and are never saved to the database. They are transmitted securely only for the duration of the request.
+*   **Visual Status Bar**: Real-time indicators in the header show exactly which key set is currently active.
+
 ---
 
 ## 📦 Installation
@@ -84,7 +91,9 @@ Just paste a GitHub URL. The system automatically:
 ### Prerequisites
 *   Node.js 18+
 *   MongoDB Instance (Local or Atlas)
-*   API Keys: `GOOGLE_GENERATIVE_AI_API_KEY`, `GROQ_API_KEY`, `GITHUB_TOKEN`
+*   Node.js 18+
+*   MongoDB Instance (Local or Atlas)
+*   API Keys: `GITHUB_TOKEN` (Required), `GOOGLE_GENERATIVE_AI_API_KEY` & `GROQ_API_KEY` (Optional if using Personal Mode)
 
 ### Setup
 
