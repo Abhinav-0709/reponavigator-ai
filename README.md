@@ -84,6 +84,11 @@ Just paste a GitHub URL. The system automatically:
 *   **Zero-Persistence**: Personal keys are stored **locally in your browser** (localStorage) and are never saved to the database. They are transmitted securely only for the duration of the request.
 *   **Visual Status Bar**: Real-time indicators in the header show exactly which key set is currently active.
 
+### 5. Secure User Authentication
+*   **GitHub OAuth**: One-click sign-in using your GitHub account.
+*   **Self-Hosted Auth**: Powered by **Better Auth** for complete data ownership. No third-party tracking.
+*   **Session Management**: Secure, database-backed sessions stored in MongoDB.
+
 ---
 
 ## 📦 Installation
@@ -94,6 +99,7 @@ Just paste a GitHub URL. The system automatically:
 *   Node.js 18+
 *   MongoDB Instance (Local or Atlas)
 *   API Keys: `GITHUB_TOKEN` (Required), `GOOGLE_GENERATIVE_AI_API_KEY` & `GROQ_API_KEY` (Optional if using Personal Mode)
+*   **Auth Secrets**: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `BETTER_AUTH_SECRET`
 
 ### Setup
 
@@ -111,11 +117,22 @@ Just paste a GitHub URL. The system automatically:
 3.  **Environment Configuration**
     Create a `.env.local` file:
     ```env
-    MONGODB_URI=your-mongodb-url(localhost or atlas any)
+    MONGODB_URI=your-mongodb-url
     GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_key
     GROQ_API_KEY=your_groq_key
     GITHUB_TOKEN=your_github_pat_token
+
+    # Authentication (Better Auth)
+    GITHUB_CLIENT_ID=your_github_oauth_client_id
+    GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
+    BETTER_AUTH_SECRET=generate_using_openssl_rand_base64_32
+    NEXT_PUBLIC_BASE_URL=http://localhost:3000
     ```
+
+    > **GitHub OAuth Setup**:
+    > 1. Go to Developer Settings > OAuth Apps > New OAuth App.
+    > 2. Homepage URL: `http://localhost:3000`
+    > 3. **Authorization Callback URL**: `http://localhost:3000/api/auth/callback/github`
 
 4.  **Run Development Server**
     ```bash

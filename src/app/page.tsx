@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { Settings } from "lucide-react";
 import { SettingsDrawer } from "@/components/SettingsDrawer";
 import { APIStatus } from "@/components/APIStatus";
+import { SignInButton } from "@/components/SignInButton";
 
 export default function Home() {
     const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -65,6 +66,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center gap-4">
+                    <SignInButton />
                     <APIStatus onClick={() => setSettingsOpen(true)} />
                     <Button size="icon" variant="ghost" onClick={() => setSettingsOpen(true)} className="text-slate-400 hover:text-blue-400">
                         <Settings size={20} />
