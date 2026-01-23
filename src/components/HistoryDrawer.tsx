@@ -31,9 +31,9 @@ export function HistoryDrawer({ isOpen, onClose, onSelectRepo }: HistoryDrawerPr
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}   
+                        exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
                     />
 
                     {/* Drawer */}
@@ -42,7 +42,7 @@ export function HistoryDrawer({ isOpen, onClose, onSelectRepo }: HistoryDrawerPr
                         animate={{ x: 0 }}
                         exit={{ x: "-100%" }}
                         transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                        className="fixed left-0 top-0 bottom-0 w-[80vw] md:w-[400px] bg-slate-900  border-r border-slate-800 z-50 flex flex-col shadow-2xl "
+                        className="fixed left-0 top-0 bottom-0 w-[80vw] md:w-[400px] bg-slate-900  border-r border-slate-800 z-[70] flex flex-col shadow-2xl "
                     >
                         <div className="p-6 border-b border-slate-800">
                             <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent flex items-center gap-2">

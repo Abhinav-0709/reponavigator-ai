@@ -58,7 +58,8 @@ export const orchestrator = {
             - Format nicely with Markdown.
             - BE EXTREMELY CONCISE. Focus primarily on Tech Stack and Architecture unless asked otherwise.
             - Avoid generic introductions or conclusions. Go straight to the point.
-            - If explaining architecture or flow, YOU CAN GENERATE A DIAGRAM. output a \`mermaid\` code block.`,
+            - If explaining architecture or flow, YOU CAN GENERATE A DIAGRAM. output a \`mermaid\` code block.
+            - CRITICAL: When creating mermaid diagrams, ALWAYS put node labels in quotes. Example: id["Label (with text)"] instead of id[Label (with text)]. This prevents syntax errors.`,
             messages,
             onFinish: async ({ text }) => {
                 if (onFinish) await onFinish(text);

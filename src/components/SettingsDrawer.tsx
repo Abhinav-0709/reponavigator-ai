@@ -63,7 +63,7 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
                     />
 
                     {/* Drawer */}
@@ -72,7 +72,7 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                        className="fixed right-0 top-0 bottom-0 w-[80vw] md:w-[400px] bg-slate-950 border-l border-slate-800 z-50 flex flex-col shadow-2xl"
+                        className="fixed right-0 top-0 bottom-0 w-[80vw] md:w-[400px] bg-slate-950 border-l border-slate-800 z-[70] flex flex-col shadow-2xl"
                     >
                         <div className="p-6 border-b border-slate-800 flex justify-between items-center">
                             <h2 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-2">
@@ -98,11 +98,13 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                                         placeholder="gsk_..."
                                         className="bg-slate-900 border-slate-700 text-white font-mono text-sm"
                                     />
-                                    <div className="flex items-center justify-between text-xs">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                                         <p className="text-slate-500">
                                             Used for planning and research (Librarian Agent).
                                         </p>
-                                        <StatusBadge hasLocal={!!groqKey} hasServer={serverKeys.hasGroq} />
+                                        <div className="shrink-0">
+                                            <StatusBadge hasLocal={!!groqKey} hasServer={serverKeys.hasGroq} />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -118,11 +120,13 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                                         placeholder="AIza..."
                                         className="bg-slate-900 border-slate-700 text-white font-mono text-sm"
                                     />
-                                    <div className="flex items-center justify-between text-xs">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                                         <p className="text-slate-500">
                                             Used for generating final responses (Architect Agent).
                                         </p>
-                                        <StatusBadge hasLocal={!!geminiKey} hasServer={serverKeys.hasGemini} />
+                                        <div className="shrink-0">
+                                            <StatusBadge hasLocal={!!geminiKey} hasServer={serverKeys.hasGemini} />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

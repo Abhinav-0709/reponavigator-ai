@@ -19,6 +19,12 @@ export function SignInButton() {
 
     const handleSignOut = async () => {
         setIsLoading(true);
+        // Clear local keys
+        localStorage.removeItem("groq_api_key");
+        localStorage.removeItem("google_api_key");
+        // Update UI
+        window.dispatchEvent(new Event('keys-updated'));
+        
         await authClient.signOut();
         window.location.reload();
     };
@@ -26,6 +32,9 @@ export function SignInButton() {
     if (session.data) {
         return (
             <div className="flex items-center gap-3">
+                <a href="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white mr-2 transition-colors">
+                    Dashboard
+                </a>
                 {session.data.user.image && (
                     <img
                         src={session.data.user.image}

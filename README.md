@@ -24,13 +24,13 @@ The core logic resides in `src/lib/agents/orchestrator.ts`. Every user query tri
 
 2.  **The Architect (Google Gemini 2.5 Flash)**
     *   **Role**: Synthesizer & Generator.
-    *   **Function**: Receives the Librarian's plan and the raw file context. It uses its massive context window to reason across files and generate a precise, Markdown-formatted answer, including Mermaid.js diagrams if requested.
+    *   **Function**: Receives the Librarian's plan and the raw file context. It uses its massive context window and reasoning capabilities to generate a precise, Markdown-formatted answer, including **Mermaid.js diagrams** when requested.
 
 ### Data Ingestion & Caching Layer
 Located in `src/app/actions/ingestRepo.ts`.
 *   **Structure Extraction**: recurses through the GitHub API to map the file tree.
 *   **Atomic Persistence**: Repository metadata and architectural summaries are stored in **MongoDB**.
-*   **Smart Caching**: Subsequent requests for the same repository bypass the AI analysis phase, serving the cached architecture summary instantly `(O(1) lookup)`.
+*   **Smart Caching**: subsequent requests for the same repository bypass the AI analysis phase, serving the cached architecture summary instantly `(O(1) lookup)`.
 
 ---
 
@@ -46,6 +46,7 @@ Located in `src/app/actions/ingestRepo.ts`.
 *   **Schemas**:
     *   `Repository`: Stores repo metadata, file tree structure, and the AI-generated architecture summary.
     *   `Message`: Stores chat history for persistent conversations across sessions.
+    *   `UserHistory` & `ActivityLog`: Tracks authentication-aware user actions.
 
 ### AI & Agents
 *   **Orchestration**: `ai` (Vercel AI SDK).
@@ -54,7 +55,7 @@ Located in `src/app/actions/ingestRepo.ts`.
     *   `@ai-sdk/openai`: Interface for Groq (via OpenAI-compatible endpoint).
 
 ### Client Features
-*   **PDF Generation**: `html-to-image` + `jspdf` for vector-quality export of architecture reports.
+*   **PDF Generation**: `html-to-image` + `jspdf` for vector-quality report export.
 *   **State Management**: React Server Components + Client Hooks.
 
 ---
@@ -69,33 +70,27 @@ Just paste a GitHub URL. The system automatically:
 4.  Persists the result for future users.
 
 ### 2. Context-Aware Chat
-*   **Floating Chat Interface**: A persistent, expandable chat window that stays with you.
+*   **Dedicated Chat Page**: Deep-dive into any repository with a full-screen, focused chat interface (`/chat/[repoId]`).
+*   **Diagram Support**: Ask the AI to "Draw the architecture," and it will render interactive **Mermaid.js** diagrams alongside the explanation.
 *   **History Persistence**: Chat sessions are saved to MongoDB. You can leave and come back to your conversation.
-*   **Smart Context**: The agents are aware of the file structure injected during ingestion.
 
-### 3. Exportable Artifacts
-*   **PDF Reports**: One-click export of the AI-generated Architecture Summary.
-*   **Modern CSS Support**: Uses browser-native rendering (foreignObject) to correctly capture modern CSS variables and layouts in the PDF.
+### 3. User Dashboard
+A personalized workspace for logged-in users:
+*   **Repository Grid**: View all repositories you've analyzed, complete with "Last Visited" dates and one-click access.
+*   **Activity Feed**: A real-time timeline tracking your analysis and viewing habits.
+*   **Management**: Iterate on your history—delete old repositories or revisit cached ones instantly.
 
-### 4. Flexible API Authentication & Security
-*   **Dual-Mode Authentication**:
-    *   **Global Mode (Blue)**: Uses server-configured API keys for seamless onboarding.
-    *   **Personal Mode (Green)**: Users can input their own Groq/Gemini keys via the Settings Drawer. This overrides the global keys for their session.
-*   **Zero-Persistence**: Personal keys are stored **locally in your browser** (localStorage) and are never saved to the database. They are transmitted securely only for the duration of the request.
-*   **Visual Status Bar**: Real-time indicators in the header show exactly which key set is currently active.
-
-### 5. Secure User Authentication
-*   **GitHub OAuth**: One-click sign-in using your GitHub account.
-*   **Self-Hosted Auth**: Powered by **Better Auth** for complete data ownership. No third-party tracking.
-*   **Session Management**: Secure, database-backed sessions stored in MongoDB.
+### 4. Flexible Authentication
+*   **GitHub OAuth**: One-click sign-in via Better Auth.
+*   **API Key Management**:
+    *   **Global Mode**: Use server-configured keys for quick setup.
+    *   **Personal Mode**: Override with your own Groq/Gemini keys securely (stored only in browser `localStorage`).
 
 ---
 
 ## 📦 Installation
 
 ### Prerequisites
-*   Node.js 18+
-*   MongoDB Instance (Local or Atlas)
 *   Node.js 18+
 *   MongoDB Instance (Local or Atlas)
 *   API Keys: `GITHUB_TOKEN` (Required), `GOOGLE_GENERATIVE_AI_API_KEY` & `GROQ_API_KEY` (Optional if using Personal Mode)
@@ -148,7 +143,8 @@ The chat endpoint `src/app/api/chat/route.ts` handles multi-modal message format
 
 ### Performance Optimization
 *   **Typewriter Effect**: Custom React hook for smooth text streaming without blocking the UI thread.
-*   **Lazy Loading**: Heavy components like the PDF generator are only loaded/executed on demand.
+*   **Smart Caching**: Logic in `ingestRepo.ts` detects re-visits to existing repositories, serving cached data while still updating User History and Activity Logs.
+*   **Optimized Rendering**: Extensive use of `z-index` layering and sticky headers ensures a glitch-free experience on mobile and desktop.
 
 ---
 

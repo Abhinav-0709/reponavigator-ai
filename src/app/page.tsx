@@ -12,14 +12,9 @@ import { HistoryDrawer } from "@/components/HistoryDrawer";
 import { DownloadSummaryButton } from "@/components/DownloadSummaryButton";
 import { motion } from "framer-motion";
 
-import { Settings } from "lucide-react";
-import { SettingsDrawer } from "@/components/SettingsDrawer";
-import { APIStatus } from "@/components/APIStatus";
-import { SignInButton } from "@/components/SignInButton";
+import { Header } from "@/components/Header";
 
 export default function Home() {
-    const [isDrawerOpen, setDrawerOpen] = useState(false);
-    const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [viewState, setViewState] = useState<any>(null); // State for selected history item
 
     const [state, formAction, isPending] = useActionState(async (prevState: any, formData: FormData) => {
@@ -42,42 +37,7 @@ export default function Home() {
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-purple-500/10 rounded-full blur-[100px]" />
             </div>
 
-            <HistoryDrawer
-                isOpen={isDrawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                onSelectRepo={(repo) => {
-                    setViewState(repo);
-                    setDrawerOpen(false);
-                }}
-            />
-
-            {/* Header */}
-            <header className="relative z-10 flex items-center justify-between p-6 md:px-12 border-b border-white/5 backdrop-blur-md sticky top-0 bg-[#0A0A0B]/80">
-                <div className="flex items-center gap-4">
-                    <Button size="icon" variant="ghost" onClick={() => setDrawerOpen(true)} className="text-slate-400 hover:text-blue-400">
-                        <Menu />
-                    </Button>
-                    <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-                        <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg">
-                            <Command size={16} className="text-white" />
-                        </div>
-                        RepoNavigator
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <SignInButton />
-                    <APIStatus onClick={() => setSettingsOpen(true)} />
-                    <Button size="icon" variant="ghost" onClick={() => setSettingsOpen(true)} className="text-slate-400 hover:text-blue-400">
-                        <Settings size={20} />
-                    </Button>
-                    <a href="https://github.com" target="_blank" className="text-slate-400 hover:text-white transition-colors">
-                        <Github size={20} />
-                    </a>
-                </div>
-            </header>
-
-            <SettingsDrawer isOpen={isSettingsOpen} onClose={() => setSettingsOpen(false)} />
+            <Header />
 
             <div className="relative z-10 max-w-5xl mx-auto px-4 py-16 md:py-24 flex flex-col items-center">
                 {/* Hero */}

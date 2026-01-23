@@ -43,3 +43,13 @@ export async function getRepoStructure(owner: string, repo: string): Promise<Fil
         throw new Error("Failed to fetch repository structure.");
     }
 }
+
+export async function getRepoLanguages(owner: string, repo: string): Promise<Record<string, number>> {
+    try {
+        const { data: languages } = await octokit.rest.repos.listLanguages({ owner, repo });
+        return languages;
+    } catch (error) {
+        console.error("GitHub Language API Error:", error);
+        return {};
+    }
+}
