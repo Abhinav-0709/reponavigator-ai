@@ -86,6 +86,17 @@ A personalized workspace for logged-in users:
     *   **Global Mode**: Use server-configured keys for quick setup.
     *   **Personal Mode**: Override with your own Groq/Gemini keys securely (stored only in browser `localStorage`).
 
+### 5. Smart Sync & Differential Scanning 🔄
+*   **Stale Data Prevention**: Automatically fetches the latest commit hash from GitHub on every visit.
+*   **Intelligent Validation**:
+    *   **Cache Hit**: If the hash matches, serves instant cached results (`O(1)`).
+    *   **Auto-Update**: If the hash differs, triggers a re-analysis.
+*   **Patch Updates**: If <20 files changed, only the *diff* is analyzed to save AI tokens.
+
+### 6. Repository Battle Arena ⚔️
+*   **Side-by-Side Comparison**: Select any two analyzed repositories to see them face off.
+*   **AI Verdict**: The Architect analyzes both tech stacks and patterns to generate a comparative report on strengths, weaknesses, and ideal use cases.
+
 ---
 
 ## 📦 Installation
@@ -154,6 +165,22 @@ I value **Systems Thinking**. When contributing, please focus on:
 1.  **Scalability**: Ensure database queries are indexed.
 2.  **Modularity**: Keep the "Librarian" and "Architect" roles distinct in the orchestrator.
 3.  **Type Safety**: Maintain strict TypeScript definitions for all AI responses.
+
+---
+
+---
+
+## 🔮 Future Roadmap
+
+### 1. Enterprise Infrastructure (In Progress) 🏗️
+*   **Redis + BullMQ**: Move ingestion to background job queues to handle large repositories and prevent timeouts.
+*   **Rate Limiting**: Protect API usage.
+
+### 2. Team Workspaces
+*   Share analysis history with team members.
+
+
+
 
 ---
 

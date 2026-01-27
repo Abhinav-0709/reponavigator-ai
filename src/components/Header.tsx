@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link as LinkIcon, Github, Menu, X, Settings, Command } from "lucide-react";
+import { Link as LinkIcon, Github, Menu, X, Settings, Command, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SignInButton } from "@/components/SignInButton";
 import { APIStatus } from "@/components/APIStatus";
@@ -50,6 +50,12 @@ export function Header() {
 
                     {/* Desktop Actions */}
                     <div className="hidden md:flex items-center gap-3">
+                        <Link href="/compare">
+                            <Button variant="ghost" className="text-slate-400 hover:text-orange-400 gap-2">
+                                <Swords size={18} />
+                                <span className="hidden lg:inline">Battle</span>
+                            </Button>
+                        </Link>
                         <SignInButton />
                         <div className="h-6 w-px bg-white/10" />
                         <APIStatus onClick={() => setSettingsOpen(true)} />

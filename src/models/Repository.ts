@@ -9,6 +9,7 @@ export interface IRepository extends Document {
   status?: string;
   lastAnalyzed?: Date;
   tokenUsage: number;
+  lastCommitHash?: string;
   updatedAt: Date;
 }
 
@@ -21,6 +22,7 @@ const RepoSchema = new Schema<IRepository>({
   status: String,
   lastAnalyzed: Date,
   tokenUsage: { type: Number, default: 0 },
+  lastCommitHash: String,
 }, { timestamps: true });
 
 export default mongoose.models.Repository || mongoose.model<IRepository>('Repository', RepoSchema);

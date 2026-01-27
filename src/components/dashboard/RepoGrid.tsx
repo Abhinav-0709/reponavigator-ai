@@ -33,6 +33,7 @@ export function RepoGrid({ repos }: { repos: Repo[] }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {repos.map((repo, i) => (
                 <motion.div
+                    key={repo._id}
                     // ... props ...
                     className="group relative bg-slate-900/50 border border-slate-800 rounded-xl hover:border-blue-500/50 transition-all overflow-hidden"
                 >
