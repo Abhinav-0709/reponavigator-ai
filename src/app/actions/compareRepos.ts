@@ -37,7 +37,7 @@ export async function compareRepos(repoId1: string, repoId2: string) {
         `;
 
         const { text } = await generateText({
-            model: createGoogle()("gemini-2.5-flash"), // Using Pro for better reasoning on comparison
+            model: createGoogle()("gemini-2.5-flash"),
             prompt: prompt,
         });
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { MermaidBlock } from './MermaidBlock';
+import { MermaidRenderer } from './MermaidRenderer';
 import remarkGfm from 'remark-gfm';
 
 interface MarkdownRendererProps {
@@ -34,7 +34,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
                     const language = match ? match[1] : '';
 
                     if (language === 'mermaid') {
-                        return <MermaidBlock code={String(children).replace(/\n$/, '')} />;
+                        return <MermaidRenderer chart={String(children).replace(/\n$/, '')} />;
                     }
 
                     return match ? (

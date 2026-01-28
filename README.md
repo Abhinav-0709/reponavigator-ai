@@ -6,7 +6,7 @@ RepoNavigator AI is a next-generation codebase analysis tool powered by a **Hybr
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Status](https://img.shields.io/badge/status-Production-green.svg)
-![Tech](https://img.shields.io/badge/stack-Next.js_15_%7C_Tailwind_%7C_MongoDB-black.svg)
+![Tech](https://img.shields.io/badge/stack-Next.js_16_%7C_Tailwind_%7C_MongoDB-black.svg)
 
 ---
 
@@ -17,10 +17,10 @@ RepoNavigator is built on a **Dual-Agent Pipeline** designed to overcome the lim
 ### The Hybrid AI Pipeline
 The core logic resides in `src/lib/agents/orchestrator.ts`. Every user query triggers a two-step process:
 
-1.  **The Librarian (Groq / Llama-3-70b)**
+1.  **The Librarian (Smart Context Algorithm)**
     *   **Role**: Planner & Context Selector.
-    *   **Function**: Analyzes the directory structure and user query to formulate a "Research Plan". It identifies exactly which files or components are relevant without needing to read the entire codebase.
-    *   **Latency**: <300ms.
+    *   **Function**: A deterministic ranking engine that prioritizes critical files (`package.json`, `README.md`, entry points) to maximize AI context quality while minimizing noise.
+    *   **Latency**: <10ms.
 
 2.  **The Architect (Google Gemini 2.5 Flash)**
     *   **Role**: Synthesizer & Generator.
@@ -37,7 +37,7 @@ Located in `src/app/actions/ingestRepo.ts`.
 ## 🛠 Tech Stack
 
 ### Core Platform
-*   **Framework**: [Next.js 15 (App Router)](https://nextjs.org/) - Server Actions for backend logic.
+*   **Framework**: [Next.js 16 (App Router)](https://nextjs.org/) - Server Actions for backend logic.
 *   **Runtime**: Node.js.
 *   **Styling**: Tailwind CSS v4 + Framer Motion (for "smooth" interfaces).
 
@@ -71,13 +71,15 @@ Just paste a GitHub URL. The system automatically:
 
 ### 2. Context-Aware Chat
 *   **Dedicated Chat Page**: Deep-dive into any repository with a full-screen, focused chat interface (`/chat/[repoId]`).
-*   **Diagram Support**: Ask the AI to "Draw the architecture," and it will render interactive **Mermaid.js** diagrams alongside the explanation.
+*   **Diagram Support**: Automatically renders interactive **Mermaid.js** diagrams (Flowcharts, Class Diagrams) to visualize the architecture.
+    *   **Smart Rendering**: Custom renderer ensures secure and glitch-free visualization of complex systems.
 *   **History Persistence**: Chat sessions are saved to MongoDB. You can leave and come back to your conversation.
 
 ### 3. User Dashboard
 A personalized workspace for logged-in users:
 *   **Repository Grid**: View all repositories you've analyzed, complete with "Last Visited" dates and one-click access.
 *   **Activity Feed**: A real-time timeline tracking your analysis and viewing habits.
+*   **Credit Meter**: Real-time tracking of AI Token Usage per repository, helping you monitor the cost/complexity of your analyses.
 *   **Management**: Iterate on your history—delete old repositories or revisit cached ones instantly.
 
 ### 4. Flexible Authentication
@@ -172,14 +174,16 @@ I value **Systems Thinking**. When contributing, please focus on:
 
 ## 🔮 Future Roadmap
 
-### 1. Enterprise Infrastructure (In Progress) 🏗️
+### 1. Infrastructure Specialist (DevOps Agent) 🏗️
+*   **Deep Dive**: Specialized agent to analyze `Dockerfile`, `k8s`, and `Terraform` files.
+*   **Deployment**: Generates AWS/GCP/Azure deployment strategies.
+
+### 2. Enterprise Infrastructure
 *   **Redis + BullMQ**: Move ingestion to background job queues to handle large repositories and prevent timeouts.
 *   **Rate Limiting**: Protect API usage.
 
-### 2. Team Workspaces
+### 3. Team Workspaces
 *   Share analysis history with team members.
-
-
 
 
 ---

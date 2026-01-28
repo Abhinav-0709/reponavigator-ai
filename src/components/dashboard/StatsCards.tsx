@@ -28,7 +28,7 @@ export function StatsCards({ activeRepos, tokenSavings }: StatsProps) {
             border: "border-blue-500/20"
         },
         {
-            label: "Est. Token Savings",
+            label: "Token Usage",
             value: `${(tokenSavings / 1000).toFixed(1)}k`,
             icon: Zap,
             color: "text-amber-400",

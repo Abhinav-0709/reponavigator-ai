@@ -1,33 +1,88 @@
 "use client";
 
-import { useState, useActionState } from "react";
-import { ingestRepo } from "@/app/actions/ingestRepo";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
-import { Github, Loader2, Search, Zap, Menu, Command } from "lucide-react";
+import { Github, Loader2, Search, Zap, Menu, Command, Settings } from "lucide-react";
 import { TypewriterEffect } from "@/components/TypewriterEffect";
 import { FloatingChat } from "@/components/FloatingChat";
 import { HistoryDrawer } from "@/components/HistoryDrawer";
 import { DownloadSummaryButton } from "@/components/DownloadSummaryButton";
 import { motion } from "framer-motion";
-
+import { SettingsDrawer } from "@/components/SettingsDrawer";
 import { Header } from "@/components/Header";
 
+
 export default function Home() {
+    const [isDrawerOpen, setDrawerOpen] = useState(false);
+    const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [viewState, setViewState] = useState<any>(null); // State for selected history item
 
-    const [state, formAction, isPending] = useActionState(async (prevState: any, formData: FormData) => {
-        const apiKeys = {
-            groq: localStorage.getItem("groq_api_key") || undefined,
-            google: localStorage.getItem("google_api_key") || undefined,
-        };
-        const res = await ingestRepo(formData.get("repoUrl") as string, apiKeys);
-        if (res.success) {
-            setViewState(res.data); // Sync form result to view state
+    // Progress State
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [progressStatus, setProgressStatus] = useState<string>("");
+
+    const handleAnalyze = async (formData: FormData) => {
+        const repoUrl = formData.get("repoUrl") as string;
+        if (!repoUrl) return;
+
+        setIsAnalyzing(true);
+        setProgressStatus("Initializing...");
+        setViewState(null); // Clear previous
+
+        try {
+            const apiKeys = {
+                groq: localStorage.getItem("groq_api_key") || undefined,
+                google: localStorage.getItem("google_api_key") || undefined,
+            };
+
+            const response = await fetch('/api/ingest', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: repoUrl, apiKeys })
+            });
+
+            if (!response.body) throw new Error("No response body");
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                // Handle multiple JSON objects in one chunk
+                const lines = chunk.split('\n').filter(line => line.trim() !== '');
+
+                for (const line of lines) {
+                    try {
+                        const update = JSON.parse(line);
+
+                        if (update.status) {
+                            setProgressStatus(update.message);
+                        }
+                        if (update.success) {
+                            setViewState(update.data);
+                            setIsAnalyzing(false);
+                        }
+                        if (update.success === false) {
+                            console.error(update.error);
+                            setProgressStatus(`Error: ${update.error}`);
+                            setIsAnalyzing(false);
+                        }
+                    } catch (e) {
+                        console.error("Error parsing chunk", e);
+                    }
+                }
+            }
+        } catch (e: any) {
+            console.error("Stream Error", e);
+            setProgressStatus("An unexpected error occurred.");
+            setIsAnalyzing(false);
         }
-        return res;
-    }, null);
+    };
 
     return (
         <main className="min-h-screen bg-[#0A0A0B] text-white selection:bg-blue-500/30 overflow-x-hidden">
@@ -37,7 +92,22 @@ export default function Home() {
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-purple-500/10 rounded-full blur-[100px]" />
             </div>
 
-            <Header />
+            <HistoryDrawer
+                isOpen={isDrawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                onSelectRepo={(repo) => {
+                    setViewState(repo);
+                    setDrawerOpen(false);
+                }}
+            />
+
+            {/* Header */}
+            <Header 
+                onOpenHistory={() => setDrawerOpen(true)} 
+                onOpenSettings={() => setSettingsOpen(true)} 
+            />
+
+            <SettingsDrawer isOpen={isSettingsOpen} onClose={() => setSettingsOpen(false)} />
 
             <div className="relative z-10 max-w-5xl mx-auto px-4 py-16 md:py-24 flex flex-col items-center">
                 {/* Hero */}
@@ -67,7 +137,7 @@ export default function Home() {
                     className="w-full max-w-2xl relative group"
                 >
                     <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
-                    <form action={formAction} className="relative flex gap-2 bg-[#121214] p-2 pr-2 rounded-xl border border-white/10 shadow-2xl items-center">
+                    <form action={handleAnalyze} className="relative flex gap-2 bg-[#121214] p-2 pr-2 rounded-xl border border-white/10 shadow-2xl items-center">
                         <div className="pl-4 text-slate-500">
                             <Github size={20} />
                         </div>
@@ -78,16 +148,16 @@ export default function Home() {
                             required
                         />
                         <Button
-                            disabled={isPending}
+                            disabled={isAnalyzing}
                             className="h-12 px-8 bg-white text-black hover:bg-slate-200 rounded-lg font-semibold transition-all"
                         >
-                            {isPending ? <Loader2 className="animate-spin" /> : "Analyze"}
+                            {isAnalyzing ? <Loader2 className="animate-spin" /> : "Analyze"}
                         </Button>
                     </form>
                 </motion.div>
 
                 {/* Results */}
-                {(viewState || isPending) && (
+                {(viewState || isAnalyzing) && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -97,13 +167,16 @@ export default function Home() {
                             {/* Decorative top border */}
                             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50" />
 
-                            {isPending ? (
+                            {isAnalyzing ? (
                                 <div className="flex flex-col items-center justify-center py-20 space-y-6">
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20 animate-pulse" />
                                         <Loader2 className="w-12 h-12 text-blue-500 animate-spin relative z-10" />
                                     </div>
-                                    <p className="text-slate-400 text-lg animate-pulse">Consulting the Librarian...</p>
+                                    <div className="text-center space-y-2">
+                                        <p className="text-slate-200 text-lg font-medium animate-pulse">{progressStatus}</p>
+                                        <p className="text-xs text-slate-500">This might take up to 60s for large repos</p>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="space-y-6">
