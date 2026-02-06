@@ -63,8 +63,26 @@ export function StatsCards({ activeRepos, tokenSavings }: StatsProps) {
                             <div className={`w-2 h-2 rounded-full ${apiKeyStatus === "active" ? "bg-emerald-400" : "bg-red-400"} animate-pulse`} />
                         )}
                     </div>
-                    <div className="text-2xl font-bold text-white mb-1">{card.value}</div>
-                    <div className="text-sm text-slate-400">{card.label}</div>
+                    {/* Energy Bar for Token Usage only */}
+                    {card.label === "Token Usage" ? (
+                        <div>
+                            <div className="flex justify-between items-end mb-1">
+                                <div className="text-2xl font-bold text-white">{card.value}</div>
+                                <div className="text-xs text-amber-400 font-mono">
+                                    {(tokenSavings / 100000 * 100).toFixed(0)}% Charged
+                                </div>
+                            </div>
+                            <div className="h-2 w-full bg-amber-500/10 rounded-full overflow-hidden border border-amber-500/20">
+                                <div 
+                                    className="h-full bg-gradient-to-r from-amber-600 to-yellow-400 shadow-[0_0_10px_rgba(245,158,11,0.5)] transition-all duration-1000"
+                                    style={{ width: `${Math.min((tokenSavings / 100000) * 100, 100)}%` }}
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-2xl font-bold text-white mb-1">{card.value}</div>
+                    )}
+                    <div className="text-sm text-slate-400 mt-1">{card.label}</div>
                 </motion.div>
             ))}
         </div>

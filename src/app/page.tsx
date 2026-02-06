@@ -9,7 +9,7 @@ import { TypewriterEffect } from "@/components/TypewriterEffect";
 import { FloatingChat } from "@/components/FloatingChat";
 import { HistoryDrawer } from "@/components/HistoryDrawer";
 import { DownloadSummaryButton } from "@/components/DownloadSummaryButton";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { SettingsDrawer } from "@/components/SettingsDrawer";
 import { Header } from "@/components/Header";
 
@@ -18,6 +18,7 @@ export default function Home() {
     const [isDrawerOpen, setDrawerOpen] = useState(false);
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [viewState, setViewState] = useState<any>(null); // State for selected history item
+    const [activeTab, setActiveTab] = useState<"arch" | "devops">("arch");
 
     // Progress State
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -29,7 +30,7 @@ export default function Home() {
 
         setIsAnalyzing(true);
         setProgressStatus("Initializing...");
-        setViewState(null); // Clear previous
+        // setViewState(null); // Keep previous for exit animation
 
         try {
             const apiKeys = {
@@ -48,12 +49,19 @@ export default function Home() {
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
 
+            const minDelay = new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Wait for both the first chunk AND the minimum delay
+            // But since we are streaming, we just start the timer
+
+            // Track if we finished too fast
+            const startTime = Date.now();
+
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
 
                 const chunk = decoder.decode(value, { stream: true });
-                // Handle multiple JSON objects in one chunk
                 const lines = chunk.split('\n').filter(line => line.trim() !== '');
 
                 for (const line of lines) {
@@ -64,6 +72,12 @@ export default function Home() {
                             setProgressStatus(update.message);
                         }
                         if (update.success) {
+                            // Enforce minimum animation time
+                            const elapsed = Date.now() - startTime;
+                            if (elapsed < 3000) {
+                                await new Promise(resolve => setTimeout(resolve, 3000 - elapsed));
+                            }
+
                             setViewState(update.data);
                             setIsAnalyzing(false);
                         }
@@ -102,9 +116,9 @@ export default function Home() {
             />
 
             {/* Header */}
-            <Header 
-                onOpenHistory={() => setDrawerOpen(true)} 
-                onOpenSettings={() => setSettingsOpen(true)} 
+            <Header
+                onOpenHistory={() => setDrawerOpen(true)}
+                onOpenSettings={() => setSettingsOpen(true)}
             />
 
             <SettingsDrawer isOpen={isSettingsOpen} onClose={() => setSettingsOpen(false)} />
@@ -157,55 +171,121 @@ export default function Home() {
                 </motion.div>
 
                 {/* Results */}
-                {(viewState || isAnalyzing) && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="w-full mt-24"
-                    >
-                        <div className="p-8 md:p-12 rounded-3xl bg-[#121214] border border-white/5 shadow-2xl relative overflow-hidden">
+                <div className="w-full mt-24">
+                    {/* Only render if we have something to show */}
+                    {(viewState || isAnalyzing) && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="p-8 md:p-12 rounded-3xl bg-[#121214] border border-white/5 shadow-2xl relative overflow-hidden"
+                        >
                             {/* Decorative top border */}
                             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50" />
 
-                            {isAnalyzing ? (
-                                <div className="flex flex-col items-center justify-center py-20 space-y-6">
-                                    <div className="relative">
-                                        <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20 animate-pulse" />
-                                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin relative z-10" />
-                                    </div>
-                                    <div className="text-center space-y-2">
-                                        <p className="text-slate-200 text-lg font-medium animate-pulse">{progressStatus}</p>
-                                        <p className="text-xs text-slate-500">This might take up to 60s for large repos</p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between border-b border-white/5 pb-6">
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-white">{viewState.name}</h2>
-                                            <p className="text-slate-400">{viewState.owner}</p>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-sm border border-green-500/20">
-                                                {viewState.status || 'Active'}
+                            <div className="min-h-[200px]">
+                                <AnimatePresence mode="wait">
+                                    {isAnalyzing ? (
+                                        <motion.div
+                                            key="loading"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="flex flex-col items-center justify-center py-20 space-y-6"
+                                        >
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20 animate-pulse" />
+                                                <Loader2 className="w-12 h-12 text-blue-500 animate-spin relative z-10" />
                                             </div>
-                                            <DownloadSummaryButton targetId="repo-summary-content" filename={`${viewState.name}-summary.pdf`} />
-                                        </div>
-                                    </div>
+                                            <div className="text-center space-y-2">
+                                                <motion.p
+                                                    key={progressStatus} // Animate text changes
+                                                    initial={{ opacity: 0, y: 5 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    className="text-slate-200 text-lg font-medium"
+                                                >
+                                                    {progressStatus}
+                                                </motion.p>
+                                                <p className="text-xs text-slate-500">This might take up to 60s for large repos</p>
+                                            </div>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="results"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.5 }}
+                                            className="space-y-6"
+                                        >
+                                            <div className="flex items-center justify-between border-b border-white/5 pb-6">
+                                                <div>
+                                                    <h2 className="text-2xl font-bold text-white">{viewState.name}</h2>
+                                                    <p className="text-slate-400">{viewState.owner}</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-sm border border-green-500/20">
+                                                        {viewState.status || 'Active'}
+                                                    </div>
+                                                    <DownloadSummaryButton targetId="repo-summary-content" filename={`${viewState.name}-summary.pdf`} />
+                                                </div>
+                                            </div>
 
-                                    <div id="repo-summary-content" className="prose prose-invert max-w-none p-4 rounded-xl bg-[#121214]">
-                                        <h3 className="text-lg font-semibold text-blue-400 mb-4">Architecture Summary</h3>
-                                        <div className="text-slate-300 leading-relaxed">
-                                            <TypewriterEffect content={viewState.architectureMap} speed={3} />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
 
-                        {viewState && <FloatingChat repoId={viewState._id} />}
-                    </motion.div>
-                )}
+                                            <div className="border-b border-white/5 pb-4 mb-4 flex gap-6">
+                                                <button
+                                                    onClick={() => setActiveTab("arch")}
+                                                    className={`pb-2 text-sm font-medium transition-colors relative ${activeTab === 'arch' ? 'text-blue-400' : 'text-slate-500 hover:text-slate-300'}`}
+                                                >
+                                                    Architecture
+                                                    {activeTab === 'arch' && (
+                                                        <motion.div layoutId="tab-underline" className="absolute left-0 right-0 bottom-[-1px] h-0.5 bg-blue-400" />
+                                                    )}
+                                                </button>
+
+                                                {/* Only show DevOps tab if report exists or we want to show empty state */}
+                                                {viewState.devopsReport && (
+                                                    <button
+                                                        onClick={() => setActiveTab("devops")}
+                                                        className={`pb-2 text-sm font-medium transition-colors relative ${activeTab === 'devops' ? 'text-purple-400' : 'text-slate-500 hover:text-slate-300'}`}
+                                                    >
+                                                        DevOps & Deployment
+                                                        {activeTab === 'devops' && (
+                                                            <motion.div layoutId="tab-underline" className="absolute left-0 right-0 bottom-[-1px] h-0.5 bg-purple-400" />
+                                                        )}
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            <div id="repo-summary-content" className="prose prose-invert max-w-none p-4 rounded-xl bg-[#121214] min-h-[300px]">
+                                                {/* Architecture Tab */}
+                                                <div className={activeTab === 'arch' ? 'block animate-in fade-in duration-500' : 'hidden'}>
+                                                    <TypewriterEffect key={viewState._id + "-arch"} content={viewState.architectureMap} speed={3} />
+                                                </div>
+
+                                                {/* DevOps Tab */}
+                                                {viewState.devopsReport && (
+                                                    <div className={activeTab === 'devops' ? 'block animate-in fade-in duration-500' : 'hidden'}>
+                                                        <TypewriterEffect key={viewState._id + "-devops"} content={viewState.devopsReport} speed={3} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {viewState && !isAnalyzing && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <FloatingChat repoId={viewState._id} />
+                        </motion.div>
+                    )}
+                </div>
             </div>
         </main>
     );

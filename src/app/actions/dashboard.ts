@@ -54,11 +54,11 @@ export async function getDashboardData() {
                 _id: repo._id.toString(),
                 name: repo.name,
                 owner: repo.owner,
-                languages: repo.languages || {}, // languages is a Map/Object, needs care if it's a Map
+                languages: repo.languages || {}, 
                 lastVisited: h.lastVisited.toISOString(),
-                // Add other fields if needed for the grid
+               
             };
-        }).filter((repo): repo is NonNullable<typeof repo> => repo !== null), // Type guard to remove nulls
+        }).filter((repo): repo is NonNullable<typeof repo> => repo !== null), 
         activities: activities.map(a => ({
             _id: a._id.toString(),
             action: a.action,

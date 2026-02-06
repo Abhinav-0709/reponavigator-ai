@@ -6,6 +6,7 @@ export interface IRepository extends Document {
   owner: string;
   languages?: Record<string, number>;
   architectureMap?: string;
+  devopsReport?: string;
   status?: string;
   lastAnalyzed?: Date;
   tokenUsage: number;
@@ -19,6 +20,7 @@ const RepoSchema = new Schema<IRepository>({
   owner: String,
   languages: { type: Map, of: Number },
   architectureMap: String,
+  devopsReport: String,
   status: String,
   lastAnalyzed: Date,
   tokenUsage: { type: Number, default: 0 },

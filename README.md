@@ -79,7 +79,7 @@ Just paste a GitHub URL. The system automatically:
 A personalized workspace for logged-in users:
 *   **Repository Grid**: View all repositories you've analyzed, complete with "Last Visited" dates and one-click access.
 *   **Activity Feed**: A real-time timeline tracking your analysis and viewing habits.
-*   **Credit Meter**: Real-time tracking of AI Token Usage per repository, helping you monitor the cost/complexity of your analyses.
+*   **Credit Meter**: Visual **Energy Bar** 🔋 tracking real-time AI Token Usage per repository, with dynamic charging animations (`Amber Glow`).
 *   **Management**: Iterate on your history—delete old repositories or revisit cached ones instantly.
 
 ### 4. Flexible Authentication
@@ -98,6 +98,10 @@ A personalized workspace for logged-in users:
 ### 6. Repository Battle Arena ⚔️
 *   **Side-by-Side Comparison**: Select any two analyzed repositories to see them face off.
 *   **AI Verdict**: The Architect analyzes both tech stacks and patterns to generate a comparative report on strengths, weaknesses, and ideal use cases.
+3.
+### 7. DevOps & Infrastructure Agent 🏗️
+*   **Automated Guides**: specialized agent that detects `Dockerfile`, `k8s`, `wrangler.toml` (Cloudflare), and `fly.toml`.
+*   **Deployment Strategy**: Generates concise, actionable deployment guides with specific build commands and environment variable requirements (Stop Constraint: 500 words).
 
 ---
 
@@ -174,11 +178,7 @@ I value **Systems Thinking**. When contributing, please focus on:
 
 ## 🔮 Future Roadmap
 
-### 1. Infrastructure Specialist (DevOps Agent) 🏗️
-*   **Deep Dive**: Specialized agent to analyze `Dockerfile`, `k8s`, and `Terraform` files.
-*   **Deployment**: Generates AWS/GCP/Azure deployment strategies.
-
-### 2. Enterprise Infrastructure
+### 1. Enterprise Infrastructure
 *   **Redis + BullMQ**: Move ingestion to background job queues to handle large repositories and prevent timeouts.
 *   **Rate Limiting**: Protect API usage.
 
